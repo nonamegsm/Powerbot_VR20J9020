@@ -31,65 +31,72 @@ char ssid[] = "nonamegsm.biz";
 char pass[] = "0663376682";
 
 // IRDA Sygnals
-int RECV_PIN = 12; 
+//int RECV_PIN = 12; 
 int SEND_PIN = 05; 
-int IR_CNT=5;
-int IR_DELAY=2;
+//int SEND_PIN = 12; 
+
+int IR_CNT=50;
+int IR_DELAY=1;
 /* pin that is attached to interrupt */
 byte interruptPin = 13;
-
 /* Interrupt counter pin */
 int interruptCounter=0;
+/* Run timer */
+int runTimer=0;
 
 
-decode_results results;
+//decode_results results;
 
-//const uint16_t kNecTick = 550;
-//const uint16_t kNecHdrMarkTicks = 8;
-
-//818100FF (32 bits) POWER BUTTON
-uint16_t Signal_PWR[] = {4462, 4486528, 1704528, 584530, 582534, 580532, 582534, 582532, 582532, 1702528, 1700530, 582534, 580532, 582530, 584532, 584530, 586530, 1700530, 584534, 578532, 582532, 584530, 582534, 582530, 582532, 584530, 1702528, 1724506, 1698534, 1696530, 1698532, 1722506, 1698532, 1700528};
-//8181807F (32 bits) BLUE HOME BUTTON
-uint16_t Signal_HOME[] = {4464, 4482534, 1694532, 582534, 582532, 582532, 582532, 582534, 582532, 1722508, 1696534, 580532, 582530, 586528, 584530, 584530, 582532, 1702528, 1700528, 582532, 584532, 582532, 582530, 584532, 584532, 580532, 582536, 1718506, 1700530, 1700528, 1706526, 1700528, 1702528, 1702530};
-//818140BF (32 bits) AUTO BTN
-uint16_t Signal_AUTO[] = {4464, 4484532, 1698528, 586530, 584530, 582532, 586530, 584530, 584532, 1720508, 1700530, 582532, 582532, 584530, 584530, 580534, 582532, 1698530, 584532, 1702528, 580534, 582530, 584532, 582532, 582544, 572530, 1702528, 582532, 1702530, 1720508, 1700530, 1724506, 1698534, 1702526};
-//8181C03F (32 bits) MID BTN
-uint16_t Signal_MID_[] = {4464, 4486530, 1700528, 582532, 582534, 582532, 584530, 582532, 582536, 1696530, 1702528, 582532, 582532, 584530, 582534, 580534, 582534, 1722506, 1698532, 1696532, 582532, 584534, 580532, 582532, 584532, 582554, 562534, 582528, 1702528, 1698532, 1698534, 1694532, 1702530, 1698532};
-//818120DF (32 bits) SPOT BTN
-uint16_t Signal_SPOT[] = {4466, 4484528, 1702530, 580534, 582530, 582532, 584534, 580532, 582532, 1700528, 1726508, 580532, 582534, 580532, 584530, 584530, 582532, 1700528, 584530, 584532, 1698534, 580530, 584534, 578532, 584532, 584530, 1700528, 1700530, 582532, 1700528, 1702526, 1722506, 1700532, 1722508};
-//8181A05F (32 bits) GO AHEAD
-uint16_t Signal_AHEAD[] = {4464, 4484530, 1726504, 582532, 584530, 582536, 580532, 580532, 582532, 1702528, 1702526, 584532, 582530, 584532, 582534, 580532, 584530, 1698532, 1698554, 560530, 1702530, 580532, 582532, 584532, 584532, 580534, 582530, 1700530, 584530, 1702528, 1698532, 1700528, 1700530, 1702530};
-//8181609F (32 bits) LEFT BTN
-uint16_t Signal_LEFT[] = {4466, 4484530, 1702530, 582530, 584532, 582532, 582532, 584526, 586534, 1696530, 1700530, 582530, 584532, 582532, 584528, 584534, 582532, 1698534, 580532, 1722508, 1700528, 582528, 586532, 582536, 578532, 582532, 1700528, 584530, 586530, 1698530, 1702530, 1698536, 1692532, 1700532};
-//8181E01F (32 bits) RIGHT BTN
-uint16_t Signal_RIGT[] = {4462, 4480536, 1722508, 582532, 582532, 584532, 582530, 584534, 580532, 1722508, 1698534, 582534, 582532, 584530, 584532, 582532, 582534, 1698530, 1728504, 1698532, 1698530, 582532, 582534, 582530, 582532, 584530, 582532, 584530, 584530, 1706526, 1722508, 1702530, 1722508, 1698532};
-//818110EF (32 bits) PLAY STOP
-uint16_t Signal_PLST[] = {4464, 4480532, 1702530, 582530, 584532, 584528, 586530, 586534, 576532, 1698530, 1726508, 580532, 584532, 580532, 584532, 580534, 580532, 1700528, 584530, 582532, 582534, 1700528, 584532, 584530, 584532, 580532, 1700530, 1698530, 1702530, 580532, 1700530, 1724506, 1722508, 1700528};
-//8181906F (32 bits) MODE1
-uint16_t Signal_MOD1[] = {4462, 4482532, 1700528, 586532, 584530, 586528, 584534, 580532, 582536, 1698530, 1698530, 584530, 582532, 584532, 582530, 582532, 582532, 1700530, 1700530, 584530, 582530, 1698532, 582532, 586528, 580534, 584530, 582534, 1700528, 1698532, 582534, 1700528, 1700532, 1722506, 1700532};
-//8181906F (32 bits) MODE2
-uint16_t Signal_MOD2[] = {4462, 4486530, 1702528, 582534, 580532, 584536, 580534, 580532, 582536, 1696530, 1700530, 582536, 580532, 582530, 582534, 580532, 580560, 1672532, 580530, 1698532, 584532, 1698532, 582532, 582536, 578536, 580530, 1700530, 584532, 1698532, 582532, 1698530, 1700530, 1698532, 1698530};
-//8181D02F (32 bits) MUTE
-uint16_t Signal_SOUN[] = {4464, 4482534, 1698530, 584532, 586528, 584532, 584530, 582532, 582534, 1702528, 1696532, 582534, 580534, 580534, 580532, 582532, 584530, 1702528, 1700532, 1700528, 584532, 1702526, 582534, 580532, 582534, 582532, 582532, 584528, 1700530, 582532, 1700530, 1700528, 1702528, 1700532};
+uint16_t kMyNecTick = 555;
 
 
+const uint16_t kMyNecHdrMarkTicks = 8;
+const uint16_t kMyNecHdrMark = kMyNecHdrMarkTicks * kMyNecTick;
+const uint16_t kMyNecHdrSpaceTicks = 8;
+const uint16_t kMyNecHdrSpace = kMyNecHdrSpaceTicks * kMyNecTick;
+const uint16_t kMyNecBitMarkTicks = 1;
+const uint16_t kMyNecBitMark = kMyNecBitMarkTicks * kMyNecTick;
+const uint16_t kMyNecOneSpaceTicks = 3;
+const uint16_t kMyNecOneSpace = kMyNecOneSpaceTicks * kMyNecTick;
+const uint16_t kMyNecZeroSpaceTicks = 1;
+const uint16_t kMyNecZeroSpace = kMyNecZeroSpaceTicks * kMyNecTick;
+const uint16_t kMyNecRptSpaceTicks = 4;
+const uint16_t kMyNecRptSpace = kMyNecRptSpaceTicks * kMyNecTick;
+const uint16_t kMyNecRptLength = 4;
+const uint16_t kMyNecMinCommandLengthTicks = 193;
+const uint32_t kMyNecMinCommandLength = kMyNecMinCommandLengthTicks * kMyNecTick;
+const uint32_t kMyNecMinGap =
+    kMyNecMinCommandLength -
+    (kMyNecHdrMark + kMyNecHdrSpace + kNECBits * (kMyNecBitMark + kMyNecOneSpace) +
+     kMyNecBitMark);
+const uint16_t kMyNecMinGapTicks =
+    kMyNecMinCommandLengthTicks -
+    (kMyNecHdrMarkTicks + kMyNecHdrSpaceTicks +
+     kNECBits * (kMyNecBitMarkTicks + kMyNecOneSpaceTicks) + kMyNecBitMarkTicks);
 
 
-
+uint32_t cmdPWR=0x818100FFL; //(32 bits) POWER BUTTON
+uint32_t cmdHOME=0x8181807FL; //(32 bits) BLUE HOME BUTTON
+uint32_t cmdAUTO=0x818140BFL; //(32 bits) AUTO BTN
+uint32_t cmdMID=0x8181C03FL; //(32 bits) MID BTN
+uint32_t cmdSPOT=0x818120DFL; //(32 bits) SPOT BTN
+uint32_t cmdAHEAD=0x8181A05FL; //(32 bits) GO AHEAD
+uint32_t cmdLEFT=0x8181609FL; //(32 bits) LEFT BTN
+uint32_t cmdRIGHT=0x8181E01FL; //(32 bits) RIGHT BTN
+uint32_t cmdPLAYSTOP=0x818110EFL; //(32 bits) PLAY STOP
+uint32_t cmdMODE1=0x8181906FL; //(32 bits) MODE1
+uint32_t cmdMODE2=0x8181906FL; //(32 bits) MODE2
+uint32_t cmdSOUND=0x8181D02FL; //(32 bits) MUTE
 
 
 // Attach virtual serial terminal to Virtual Pin V1
 WidgetTerminal terminal(V1);
 BlynkTimer timer;
 WidgetRTC rtc;
-IRsend irsend(SEND_PIN,true,false); 
-IRrecv irrecv(RECV_PIN);
+IRsend irsend(SEND_PIN,true,false);  // direct wiring
+//IRsend irsend(SEND_PIN,true,true); // LED experiment
+//IRrecv irrecv(RECV_PIN);
 
-
-//void serialPrintUint64(uint64_t input, uint8_t base) 
-//{
-//  Serial.print(uint64ToString(input, base));
-//}
 
 void setup()
 {
@@ -121,7 +128,10 @@ void setup()
   u8x8.clear();
   u8x8.drawString(0, 0, "Running Blynk.");
 
-  irrecv.enableIRIn();  // Start the receiver
+//  irrecv.enableIRIn();  // Start the receiver
+
+
+  pinMode(SEND_PIN, INPUT);
 
   
   pinMode(interruptPin, INPUT_PULLUP);
@@ -138,23 +148,43 @@ void blink()
 }
 
 
+void DoSend(uint64_t data)
+{
+      pinMode(SEND_PIN, OUTPUT);
+      digitalWrite(SEND_PIN, HIGH);  
+
+      noInterrupts();
+      
+      irsend.sendGeneric(kMyNecHdrMark, kMyNecHdrSpace, kMyNecBitMark, kMyNecOneSpace, kMyNecBitMark,
+                  kMyNecZeroSpace, kMyNecBitMark, kMyNecTick*16, kMyNecTick*145,               
+                  data, 32, 38, true, 3,  // Repeats are handled later.
+                  33);    
+      interrupts();
+      
+      pinMode(SEND_PIN, INPUT);  
+
+}
+
+
+// You can send commands from Terminal to your hardware. Just use
+// the same Virtual Pin as your Terminal Widget
+BLYNK_WRITE(V0)
+{
+terminal.println("Button 0 Pressed") ;
+u8x8.drawString(0, 2, "Timer...");
+DoSend(cmdPLAYSTOP);
+delay(3000);
+
+}
+
 // You can send commands from Terminal to your hardware. Just use
 // the same Virtual Pin as your Terminal Widget
 BLYNK_WRITE(V2)
 {
 terminal.println("Button 1 Pressed") ;
-u8x8.drawString(0, 2, "Starting work");
+u8x8.drawString(0, 2, "Starting...");
+DoSend(cmdPLAYSTOP);
 
-      pinMode(SEND_PIN, OUTPUT);
-      digitalWrite(SEND_PIN, HIGH);  
-
-      for (int i = 0; i < IR_CNT; i++) 
-      {
-      irsend.sendNEC(0X818110EF);
-      }      
-      delay(IR_DELAY);
-      
-      pinMode(SEND_PIN, INPUT);
 }
 
 
@@ -163,24 +193,87 @@ u8x8.drawString(0, 2, "Starting work");
 BLYNK_WRITE(V3)
 {
 terminal.println("Button 2 Pressed") ;
-u8x8.drawString(0, 2, "GOING HOME");
-
-
-
-      pinMode(SEND_PIN, OUTPUT);
-      digitalWrite(SEND_PIN, HIGH);  
-
-
-      for (int i = 0; i < IR_CNT; i++) 
-      {
-      irsend.sendNEC(0X8181807F);
-      }      
-
-      delay(IR_DELAY);
-      pinMode(SEND_PIN, INPUT);
-
+u8x8.drawString(0, 2, "Going HOME");
+DoSend(cmdHOME);
       
 }
+
+// You can send commands from Terminal to your hardware. Just use
+// the same Virtual Pin as your Terminal Widget
+BLYNK_WRITE(V4)
+{
+terminal.println("Button 3 Pressed") ;
+u8x8.drawString(0, 2, "Power OFF...");
+DoSend(cmdPWR);
+}
+
+
+BLYNK_WRITE(V5)
+{
+terminal.println("Button 4 Pressed") ;
+u8x8.drawString(0, 2, "Auto Mode");
+DoSend(cmdAUTO);
+}
+
+BLYNK_WRITE(V6)
+{
+terminal.println("Button 5 Pressed") ;
+u8x8.drawString(0, 2, "Spot Mode");
+DoSend(cmdSPOT);
+}
+
+BLYNK_WRITE(V7)
+{
+terminal.println("Button 6 Pressed") ;
+u8x8.drawString(0, 2, "Go Ahead");
+DoSend(cmdAHEAD);
+}
+
+
+
+BLYNK_WRITE(V8)
+{
+terminal.println("Button 7 Pressed") ;
+u8x8.drawString(0, 2, "Left");
+DoSend(cmdLEFT);
+}
+
+
+BLYNK_WRITE(V9)
+{
+terminal.println("Button 8 Pressed") ;
+u8x8.drawString(0, 2, "Right");
+DoSend(cmdRIGHT);
+}
+
+
+
+BLYNK_WRITE(V10)
+{
+terminal.println("Button 9 Pressed") ;
+u8x8.drawString(0, 2, "cmdMODE1");
+DoSend(cmdMODE1);
+}
+
+BLYNK_WRITE(V11)
+{
+terminal.println("Button 10 Pressed") ;
+u8x8.drawString(0, 2, "cmdMODE2");
+DoSend(cmdMODE2);
+}
+
+
+BLYNK_WRITE(V12)
+{
+terminal.println("Button 11 Pressed") ;
+u8x8.drawString(0, 2, "cmdSOUND");
+DoSend(cmdSOUND);
+}
+
+
+
+
+
 
 
 // You can send commands from Terminal to your hardware. Just use
@@ -192,13 +285,34 @@ BLYNK_WRITE(V1)
   if (String("Marco") == param.asStr()) {
     terminal.println("You said: 'Marco'") ;
     terminal.println("I said: 'Polo'") ;
-  } else {
+  } else 
+  // if you type "pullup" into Terminal Widget - it will respond: "Polo:"
+  if (String("pullup") == param.asStr()) {
+    terminal.println("You said: 'pullup'") ;
+    pinMode(SEND_PIN, OUTPUT);
+    digitalWrite(SEND_PIN, HIGH);  
+  } else   
+  // if you type "pulldown" into Terminal Widget - it will respond: "Polo:"
+  if (String("pulldown") == param.asStr()) {
+    terminal.println("You said: 'pulldown'") ;
+    pinMode(SEND_PIN, OUTPUT);
+    digitalWrite(SEND_PIN, LOW);  
+  } else     
+  // if you type "pulldown" into Terminal Widget - it will respond: "Polo:"
+  if (String("disable") == param.asStr()) {
+    terminal.println("You said: 'disable'") ;
+    pinMode(SEND_PIN, INPUT);
+  } else       
+  
+  
+  {
 
     // Send it back
     terminal.print("You said:");
     u8x8.drawString(0, 1, param.asStr());
     terminal.write(param.getBuffer(), param.getLength());
     terminal.println();
+    DoSend(cmdSOUND);
   }
 
   // Ensure everything is sent
@@ -215,21 +329,30 @@ void doDECODEIRWork(decode_results *results)
 
 void doSomeIRWork()
 {
-  if (irrecv.decode(&results)) {
-    doDECODEIRWork(&results);
-    Serial.println("");
-    irrecv.resume();  // Receive the next value
-  }
+//  if (irrecv.decode(&results)) {
+//    doDECODEIRWork(&results);
+//    Serial.println("");
+//    irrecv.resume();  // Receive the next value
+//  }
 }
 
 
 void doSomeWork()
 {
-  String currentTime = String(hour()) + ":" + minute() + ":" + second() + " - " + interruptCounter;
-  u8x8.drawString(0, 3, "                ");
-  u8x8.drawString(0, 3, currentTime.c_str());
   u8x8.drawString(0, 1, "                ");
-  u8x8.drawString(0, 2, "                ");
+  u8x8.drawString(0, 2, "                ");  
+  
+  String currentTime = "Time :"+String(hour()) + ":" + minute() + ":" + second() + "  ";
+  String currentCounter = "SPI :" + String(interruptCounter);
+  String runCounter = "Run :" + String(runTimer)+" sec.";  
+  u8x8.drawString(0, 3, currentTime.c_str());
+  u8x8.drawString(0, 4, currentCounter.c_str());
+  u8x8.drawString(0, 5, runCounter.c_str());
+  
+  runTimer++;
+
+
+  
 }
 
 
