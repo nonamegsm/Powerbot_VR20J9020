@@ -170,10 +170,28 @@ void DoSend(uint64_t data)
 // the same Virtual Pin as your Terminal Widget
 BLYNK_WRITE(V0)
 {
+
+
+int virtualPin0 = param.asInt(); // assigning incoming value from pin V0 to a variable
+if (virtualPin0 == 1)
+{
 terminal.println("Button 0 Pressed") ;
-u8x8.drawString(0, 2, "Timer...");
+u8x8.drawString(0, 2, "Timer start");
 DoSend(cmdPLAYSTOP);
-delay(3000);
+delay(1000);
+}
+else
+{
+terminal.println("Button 0 Pressed") ;
+u8x8.drawString(0, 2, "Timer stop");
+DoSend(cmdHOME);
+delay(1000);
+}
+
+
+
+  
+
 
 }
 
